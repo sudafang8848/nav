@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  nav-item:
+    build: .
+    image: nav-item:latest
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./database:/app/database
+      - ./uploads:/app/uploads
+    expose:
+      - "3000"
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:stable
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx/nav-item.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./deploy/nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - nav-item
+    restart: unless-stopped
